@@ -1,0 +1,56 @@
+version: '3'
+
+networks:
+  todo-app:
+
+services:
+
+  todoapp-nginx-service:
+    image: nginx:latest
+    container_name: todoapp-nginx-container
+    ports:
+      - "8180:80"
+    volumes:
+      - ./project:/var/www/project
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - todoapp-fpm8-service
+    networks:
+      - todo-app
+
+  todoapp-fpm8-service:
+    build:
+      context: .
+      dockerfile: ./php/Dockerfile
+    container_name: todoapp-fpm8-container
+    ports:
+      - "9100:9000"
+    volumes:
+      - ./project:/var/www/project
+    networks:
+      - todo-app
+
+  todoapp-node-service:
+    image: node:latest
+    container_name: todoapp-node-container
+    volumes:
+      - ./project:/var/www/project
+    working_dir: /var/www/project
+    networks:
+      - todo-app
+
+  todoapp-mariadb-service:
+    image: mariadb:latest
+    container_name: todoapp-mariadb-container
+    ports:
+      - "3310:3306"
+    volumes:
+      - ./mariadb/database:/var/lib/mysql:rw
+    restart: always
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_PASSWORD: pass
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - todo-app

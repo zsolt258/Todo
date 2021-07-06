@@ -50,3 +50,10 @@
 
 # Embedded web-server pid file
 /.web-server-pid
+
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/Todo.iml
+/.idea/.gitignore
+/mariadb/
+/project/
